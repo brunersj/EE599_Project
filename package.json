@@ -1,14 +1,14 @@
 {
-  "name": "nodejs_fullstack",
+  "name": "nodejs_project",
   "version": "1.0.0",
-  "description": "A full stack project starter code for NodeJS.",
+  "description": "A full stack mock stock market project",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ourarash/nodejs_fullstack.git"
+    "url": "git+https://github.com/brunersj/EE599_project.git"
   },
   "keywords": [
     "nodejs",
@@ -16,14 +16,15 @@
     "frontend",
     "backend"
   ],
-  "author": "Ari Saif",
-  "license": "ISC",
+  "author": "Sam Bruner",
+  "license": "USC",
   "bugs": {
-    "url": "https://github.com/ourarash/nodejs_fullstack/issues"
+    "url": "https://github.com/brunersj/EE599_project/issues"
   },
-  "homepage": "https://github.com/ourarash/nodejs_fullstack#readme",
+  "homepage": "https://github.com/brunersj/EE599_project#readme",
   "dependencies": {
     "cors": "^2.8.5",
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "node-fetch": "^2.6.0"
   }
 }
