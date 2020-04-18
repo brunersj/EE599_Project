@@ -2,6 +2,7 @@
 
 global.fetch = require("node-fetch");
 const express = require("express");
+//var https = require('https');
 const app = express();
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -24,13 +25,12 @@ let portfolio = [];
 
 // let stock = {
 //   symbol: "",
-//   shares: [],
+//   shares: [], (vector of shares that correspond to the shares purchased at the price in the respective index in prices vector)
 //   total_shares: ,
 //   prices: []
 // }
 
-
-
+// print portfolio
 let portfolioString = JSON.stringify(portfolio, null, 2);
 console.log("portfolioString: ", portfolioString);
 
@@ -49,12 +49,48 @@ const delay = function (t) {
 async function getQuote(req_symbol) {
   const iex_key = 'pk_a8ed94273cbb45918ade3846ab74bb26';
   const iex_api_url = `https://cloud.iexapis.com/stable/stock/${req_symbol}/batch?types=quote&token=${iex_key}`;
-  const response = await fetch(iex_api_url);
-  const json = await response.json();
-  let price = json.quote.iexRealtimePrice;
-  console.log(json.quote.iexRealtimePrice);
-  return price;
+  try {
+    var response = await fetch(iex_api_url);
+    const json = await response.json();
+    let price = json.quote.iexRealtimePrice;
+    console.log(json.quote.iexRealtimePrice);
+    return price;
+
+  } catch (err) {
+    console.log(response.status);
+    throw new Error(response.status);
+  }
 }
+
+/*
+*** IEX API HTTP STATUS CODES ***
+HTTP CODE	TYPE	            DESCRIPTION
+400	      Incorrect Values	Invalid values were supplied for the API request
+400	      No Symbol	        No symbol provided
+400	      Type Required	    Batch request types parameter requires a valid value
+401	      Authorization Restricted	Hashed token authorization is restricted
+401	      Authorization Required	Hashed token authorization is required
+401	      Restricted	      The requested data is marked restricted and the account does not have access.
+401	      No Key	          An API key is required to access the requested endpoint.
+401	      Secret Key Required	The secret key is required to access to requested endpoint.
+401	      Denied Referer	The referer in the request header is not allowed due to API token domain restrictions.
+402	      Over Limit	You have exceeded your allotted message quota and pay-as-you-go is not enabled.
+402	      Free tier not allowed	The requested endpoint is not available to free accounts.
+402	      Tier not allowed	The requested data is not available to your current tier.
+403	      Authorization Invalid	Hashed token authorization is invalid.
+403  	    Disabled Key	The provided API token has been disabled
+403     	Invalid Key	The provided API token is not valid.
+403 	    Test token in production	A test token was used for a production endpoint.
+403     	Production token in sandbox	A production token was used for a sandbox endpoint.
+403     	Circuit Breaker	Your pay-as-you-go circuit breaker has been engaged and further requests are not allowed.
+403 	    Inactive	Your account is currently inactive.
+404     	Unknown Symbol	Unknown symbol provided
+404     	Not Found	Resource not found
+413     	Max Types	Maximum number of types values provided in a batch request.
+429 	    Too many requests	Too many requests hit the API too quickly. An exponential backoff of your requests is recommended.
+451     	Enterprise Permission Required	The requested data requires additional permission to access.
+500	      System Error	Something went wrong on an IEX Cloud server.
+*/
 
 /**
  * The default path
@@ -118,7 +154,7 @@ async function handleQuoteGet(req, res, query) {
     query.symbol !== undefined
   ) {
     console.log("This is a quote query");
-    req_symbol = query.symbol;
+    req_symbol = query.symbol.toUpperCase();
     price = await getQuote(req_symbol);
   } else {
     error = "ERROR: symbol not provided";
@@ -165,37 +201,41 @@ async function handleBuyPost(req, res, body) {
     body.shares !== undefined
   ) {
     console.log("This is a buy request");
-    req_symbol = body.symbol;
+    req_symbol = body.symbol.toUpperCase();
     req_shares = parseInt(body.shares);
-    price = await getQuote(req_symbol);
-    // **to do** check for valid price / symbol
+    try {
+      price = await getQuote(req_symbol);
 
-    if (price * req_shares <= cash) {
-      cash = parseFloat((cash - price * req_shares).toFixed(2));
-      console.log("cash: ", cash);
-      console.log("cost: ", req_shares * price);
+      if (price * req_shares <= cash) {
+        cash = parseFloat((cash - price * req_shares).toFixed(2));
+        console.log("cash: ", cash);
+        console.log("cost: ", req_shares * price);
 
-      // record purchase to portfolio
+        // record purchase to portfolio
 
-      // if symbol already exists in portfolio, push # of shares @ price purchased to portfolio
-      if (portfolio.find(o => o.symbol === req_symbol)) {
-        var existing_stock = portfolio.find(o => o.symbol === req_symbol);
+        // if symbol already exists in portfolio, push # of shares @ price purchased to portfolio
+        if (portfolio.find(o => o.symbol === req_symbol)) {
+          var existing_stock = portfolio.find(o => o.symbol === req_symbol);
 
-        existing_stock.shares.push(req_shares);
-        existing_stock.total_shares.push(existing_stock.total_shares + req_shares);
-        existing_stock.prices.push(price);
-      } else {
-        // else, add to portfolio
-        let stock = {
-          symbol: req_symbol,
-          shares: [req_shares],
-          total_shares: req_shares,
-          prices: [price]
+          existing_stock.shares.push(req_shares);
+          existing_stock.total_shares.push(existing_stock.total_shares + req_shares);
+          existing_stock.prices.push(price);
+        } else {
+          // else, add to portfolio
+          let stock = {
+            symbol: req_symbol,
+            shares: [req_shares],
+            total_shares: req_shares,
+            prices: [price]
+          }
+          portfolio.push(stock);
         }
-        portfolio.push(stock);
+      } else { //insufficient funds
+        error = "ERROR: insufficient funds"
       }
-    } else { //insufficient funds
-      error = "ERROR: insufficient funds"
+    } catch (err) {
+      console.error(err);
+      error = "" + err;
     }
   } else {
     error = "ERROR: symbol not provided";
@@ -241,42 +281,47 @@ async function handleSellPost(req, res, body) {
     body.shares !== undefined
   ) {
     console.log("This is a sell request");
-    req_symbol = body.symbol;
+    req_symbol = body.symbol.toUpperCase();
     req_shares = parseInt(body.shares);
     let req_shares_copy = req_shares;
-    price = await getQuote(req_symbol);
-    // **to do** check for valid price / symbol
+    try {
+      price = await getQuote(req_symbol);
+      if (portfolio.find(o => o.symbol === req_symbol)) {
+        //sum of shares of requested symbol:
+        var existing_stock = portfolio.find(o => o.symbol === req_symbol);
+        var sum = existing_stock.shares.reduce(function (a, b) {
+          return a + b;
+        }, 0);
+        // check if portfolio shares > shares requested to sell 
+        if (sum >= req_shares) {
+          while (req_shares > 0) {
+            let sell_shares = existing_stock.shares.pop();
+            if (req_shares >= sell_shares) {
+              req_shares = req_shares - sell_shares;
+            } else {
+              sell_shares = sell_shares - req_shares;
+              // push front balance of shares not sold
+              existing_stock.shares.unshift(sell_shares);
+              req_shares = 0;
+            }
 
-
-    if (portfolio.find(o => o.symbol === req_symbol)) {
-      //sum of shares of requested symbol:
-      var existing_stock = portfolio.find(o => o.symbol === req_symbol);
-      var sum = existing_stock.shares.reduce(function (a, b) {
-        return a + b;
-      }, 0);
-      // check if portfolio shares > shares requested to sell 
-      if (sum >= req_shares) {
-        while (req_shares > 0) {
-          let sell_shares = existing_stock.shares.pop();
-          if (req_shares >= sell_shares) {
-            req_shares = req_shares - sell_shares;
-          } else {
-            sell_shares = sell_shares - req_shares;
-            // push front balance of shares not sold
-            existing_stock.shares.unshift(sell_shares);
-            req_shares = 0;
           }
-
+          existing_stock.total_shares -= req_shares_copy;
+          // if there are no more shares then remove stock from portfolio
+          if (existing_stock.total_shares == 0) {
+            portfolio.splice(portfolio.indexOf(existing_stock), 1);
+          }
+          cash = parseFloat((cash + price * req_shares_copy).toFixed(2));
+          console.log("cash: ", cash);
+        } else { //insufficient shares
+          error = "ERROR: insufficient shares to complete sale"
         }
-        existing_stock.total_shares -= req_shares_copy;
-        cash = parseFloat((cash + price * req_shares_copy).toFixed(2));
-        console.log("cash: ", cash);
-      } else { //insufficient shares
-        error = "ERROR: insufficient shares to complete sale"
+      } else {
+        error = "ERROR: symbol not found in portfolio"
       }
-    }
-    else {
-      error = "ERROR: symbol not found in portfolio"
+    } catch (err) {
+      console.error(err);
+      error = "" + err;
     }
   } else {
     error = "ERROR: symbol or shares not provided";

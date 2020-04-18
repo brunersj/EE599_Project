@@ -4,7 +4,7 @@
 function initialize() {
   document.getElementById("min_value").value = "0";
   document.getElementById("max_value").value = "100";
-
+  document.getElementById("price_quote").value = "23";
   let loader = document.getElementById("loader");
   loader.style.display = "none";
 
@@ -15,7 +15,7 @@ initialize();
 /**
  * Handle the click event on Submit (Generate) button
  */
-document.getElementById("submit").onclick = function() {
+document.getElementById("submit").onclick = function () {
   submit();
 };
 
@@ -32,7 +32,7 @@ async function submit() {
   let random_value_element = document.getElementById("random-value");
 
   random_value_element.innerHTML = "Please wait...";
-  
+
   // Show the loader element (spinning wheels)
   let loader = document.getElementById("loader");
   loader.style.display = "inline-block";
@@ -50,7 +50,7 @@ async function submit() {
     const data = await axios.get(request);
 
     console.log("data.data: ", JSON.stringify(data.data, null, 2));
-    
+
 
     // Display the random value
     random_value_element.innerHTML = "Here is your random number: " + data.data.randomValue;
