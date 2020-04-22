@@ -4,7 +4,6 @@
 function initialize() {
   document.getElementById("min_value").value = "0";
   document.getElementById("max_value").value = "100";
-  document.getElementById("price_quote").value = "23";
   let loader = document.getElementById("loader");
   loader.style.display = "none";
 

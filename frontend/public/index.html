@@ -13,7 +13,7 @@
 
   <!-- Loading axios library necessary for making HTTP GET requests -->
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-  <title>Random Generator</title>
+  <title>Mock Stock</title>
 </head>
 
 <body>
@@ -21,14 +21,13 @@
     <h1 style="text-align: center;">Mock Stock</h1>
     <h3 style="text-align: center;">The Stock Market Simulator</h3>
     <hr>
+    <h4 style="text-align: left;">Balances and Positions</h4>
+    <div>
+      <label for="balances">Account value:</label>
+      <span id="balances"></span>
+    </div>
+    <hr>
     <h4 style="text-align: left;">Get Quote</h4>
-    <!-- <form action="http://127.0.0.1:5000/quote" method="POST">
-      <label for="symbol_quote">Enter Stock Symbol:</label>
-      <input type="text" id="symbol_quote" name="symbol_quote">
-      <input type="submit" id="submit_quote" value="Get Quote" onclick="submit_quote()">
-    </form> -->
-
-
     <div>
       <label for="symbol_quote">Enter Stock Symbol:</label>
       <input type="text" name="symbol_quote" id="symbol_quote" />
@@ -37,40 +36,26 @@
     </div>
     <div>
       <label for="price_quote">Latest Price Per Share:</label>
-      <output for="price_quote" name="price_quote_output"></output>
       <span id="price_quote"></span>
     </div>
-  </div>
-  <div class="container">
-    <div id="loginbox" style="margin-top: 50px;" class="mainbox col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2">
-      <div class="panel panel-info">
-        <div class="panel-heading">
-          <div class="panel-title">
-            Welcome to Mock Market - Stock Market Simulator
-          </div>
-        </div>
-
-        <div>
-          <div>
-            <span>Select the min and max values.</span>
-
-            <div>
-              <input type="number" name="min_value" id="min_value" placeholder="min value" />
-              <input type="number" name="max_value" id="max_value" placeholder="max value" />
-            </div>
-          </div>
-          <div class="text-center padding-y-sm btn-lg btn-block">
-            <input type="submit" name="submit" id="submit" value="Generate!" class="btn btn-primary mt-8"
-              onclick="submit()" />
-          </div>
-
-          <div class="text-center padding-y-sm btn-lg btn-block">
-            <span class="loader text-center" id="loader"></span>
-
-            <!-- ** show random value here. We modify the text in this span through javascript! ** -->
-            <span id="random-value"></span>
-          </div>
-        </div>
+    <hr>
+    <h4 style="text-align: left;">Initiate New Trade</h4>
+    <div>
+      <label for="buy_select">Buy</label>
+      <input type="radio" name="buy_sell" id="buy_select" />
+      <label for="sell_select">Sell</label>
+      <input type="radio" name="buy_sell" id="sell_select" />
+      <div>
+        <label for="symbol_trade">Stock Symbol:</label>
+        <input type="text" name="symbol_trade" id="symbol_trade" />
+      </div>
+      <div>
+        <label for="shares_trade">Number of Shares:</label>
+        <input type="text" name="shares_trade" id="shares_trade" />
+      </div>
+      <div>
+        <input type="submit" name="submit_trade" id="submit_trade" value="Submit Trade" class="btn btn-primary mt-8"
+          onclick="submit_trade()" />
       </div>
     </div>
   </div>
