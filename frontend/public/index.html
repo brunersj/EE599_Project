@@ -2,6 +2,26 @@
 <html lang="en-US">
 
 <head>
+
+  <style>
+    table {
+      font-family: arial, sans-serif;
+      border-collapse: collapse;
+      width: 100%;
+    }
+
+    td,
+    th {
+      border: 1px solid #dddddd;
+      text-align: left;
+      padding: 8px;
+    }
+
+    tr:nth-child(even) {
+      background-color: #dddddd;
+    }
+  </style>
+
   <!-- Loading bootstrap css file to format our html -->
   <link href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css" />
   <!-- Loading our own styles which is an animation for spinning wheels indicating waiting time -->
@@ -23,41 +43,58 @@
     <hr>
     <h4 style="text-align: left;">Balances and Positions</h4>
     <div>
-      <label for="balances">Account value:</label>
-      <span id="balances"></span>
+      <label for="balance">Account value:</label>
+      <span id="balance"></span>
+      <table id="table" style="width:50%">
+        <tr>
+          <th>Symbol</th>
+          <th>Shares</th>
+          <th>$P/L</th>
+        </tr>
+        <tr>
+        </tr>
+      </table>
     </div>
     <hr>
     <h4 style="text-align: left;">Get Quote</h4>
     <div>
-      <label for="symbol_quote">Enter Stock Symbol:</label>
-      <input type="text" name="symbol_quote" id="symbol_quote" />
+      <label for="quote_symbol">Enter Stock Symbol:</label>
+      <input type="text" name="quote_symbol" id="quote_symbol" />
       <input type="submit" name="submit_quote" id="submit_quote" value="Get Quote" class="btn btn-primary mt-8"
         onclick="submit_quote()" />
+
+      <span class="loader text-center" id="loader"></span>
+      <span id="quote_status"></span>
+
     </div>
     <div>
-      <label for="price_quote">Latest Price Per Share:</label>
-      <span id="price_quote"></span>
+      <label for="quote_price">Latest Price Per Share:</label>
+      <span id="quote_price"></span>
     </div>
     <hr>
     <h4 style="text-align: left;">Initiate New Trade</h4>
     <div>
       <label for="buy_select">Buy</label>
-      <input type="radio" name="buy_sell" id="buy_select" />
+      <input type="radio" name="buy_sell" id="buy_select" value="buy" />
       <label for="sell_select">Sell</label>
-      <input type="radio" name="buy_sell" id="sell_select" />
+      <input type="radio" name="buy_sell" id="sell_select" value="sell" />
       <div>
-        <label for="symbol_trade">Stock Symbol:</label>
-        <input type="text" name="symbol_trade" id="symbol_trade" />
+        <label for="trade_symbol">Stock Symbol:</label>
+        <input type="text" name="trade_symbol" id="trade_symbol" />
       </div>
       <div>
-        <label for="shares_trade">Number of Shares:</label>
-        <input type="text" name="shares_trade" id="shares_trade" />
+        <label for="trade_shares">Number of Shares:</label>
+        <input type="text" name="trade_shares" id="trade_shares" />
       </div>
       <div>
         <input type="submit" name="submit_trade" id="submit_trade" value="Submit Trade" class="btn btn-primary mt-8"
           onclick="submit_trade()" />
+
+        <span class="loader text-center" id="loader"></span>
+        <span id="trade_status"></span>
       </div>
     </div>
+  </div>
   </div>
 </body>
 <!-- Use script.js to handle events on this page -->

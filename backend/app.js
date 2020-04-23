@@ -52,7 +52,7 @@ async function getQuote(req_symbol) {
   try {
     var response = await fetch(iex_api_url);
     const json = await response.json();
-    let price = json.quote.iexRealtimePrice;
+    let price = json.quote.iexRealtimePrice.toFixed(2);
     console.log(json.quote.iexRealtimePrice);
     return price;
 
@@ -92,20 +92,12 @@ HTTP CODE	TYPE	            DESCRIPTION
 500	      System Error	Something went wrong on an IEX Cloud server.
 */
 
-/**
- * The default path
- */
-app.get("/", async function (req, res) {
-  if (req.query && Object.keys(req.query).length > 0) {
-    console.log("I got a query!");
-    handleGet(res, res, req.query);
-  }
-});
+
 
 /**
  * route get request to /quote path
  */
-app.get("/quote", async function (req, res) {
+app.get("/quote", async function (req, res, next) {
   if (req.query && Object.keys(req.query).length > 0) {
     console.log("I got a query!");
     handleQuoteGet(res, res, req.query);
@@ -155,7 +147,13 @@ async function handleQuoteGet(req, res, query) {
   ) {
     console.log("This is a quote query");
     req_symbol = query.symbol.toUpperCase();
-    price = await getQuote(req_symbol);
+    try {
+      price = await getQuote(req_symbol);
+    } catch (err) {
+      console.log("Error from catch:" + err);
+      error = "" + err;
+    }
+
   } else {
     error = "ERROR: symbol not provided";
   }
