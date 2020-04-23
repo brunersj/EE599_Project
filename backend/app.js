@@ -1,12 +1,14 @@
 "use strict";
-
+// ** to do ** 
+/*
+add balance to portfolio string after buy/sell
+*/
 global.fetch = require("node-fetch");
 const express = require("express");
 //var https = require('https');
 const app = express();
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({ extended: false }));
-var mongo = require('mongodb');
 
 // We need cors middleware to bypass CORS security in browsers.
 const cors = require("cors");

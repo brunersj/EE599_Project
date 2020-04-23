@@ -96,29 +96,61 @@ async function submit_trade() {
     //     console.log(error);
     //   });
 
-    // axios.post(request, {
-    //   form: {
+    //     axios.post(request, {
+    //       form: {
+    //         symbol: symbol,
+    //         shares: shares
+    //       }
+    //     }),
+    // headers: {
+    //   "Content-Type", "application/x-www-form-urlencoded"
+    // }
+    //       .then((res) => {
+    //         console.log("post res:", res);
+    //       })
+    //       .catch((error) => {
+    //         console.log(error);
+    //       });
+
+
+    // const data = await axios.post(request,
+    //   {
     //     symbol: symbol,
     //     shares: shares
-    //   }
-    // })
-    //   .then((res) => {
-    //     console.log("post res:", res);
-    //   })
-    //   .catch((error) => {
-    //     console.log(error);
     //   });
 
-    const data = await axios.post(request, {
-      symbol: symbol,
-      shares: shares
-    });
 
-    console.log("data.data: ", JSON.stringify(data.data, null, 2));
+    // ; (async () => {
+    //   axios.post(request, {
+    //     symbol: symbol,
+    //     shares: shares
+    //   })
+    // })()
 
+    var myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
+
+    var urlencoded = new URLSearchParams();
+    urlencoded.append("symbol", symbol);
+    urlencoded.append("shares", shares);
+
+    var requestOptions = {
+      method: 'POST',
+      headers: myHeaders,
+      body: urlencoded,
+      redirect: 'follow'
+    };
+
+    fetch(request, requestOptions)
+      .then(response => response.text())
+      .then(result => console.log(result))
+      .catch(error => console.log('error', error));
+
+    // console.log("data.data: ", JSON.stringify(data.data, null, 2));
+    console.log("after post");
 
     // Display the random value
-    trade_status_element.innerHTML = "success";
+    trade_status_element.innerHTML = "Order placed";
 
   } catch (err) {
     trade_status_element.innerHTML = err;
