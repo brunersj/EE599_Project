@@ -46,14 +46,17 @@
     <div>
       <label for="balance">Account value:</label>
       <span id="balance"></span>
-      <table id="table" style="width:50%">
-        <tr>
+      <table id="positions_table" style="width:50%">
+        <thead id="table_head">
           <th>Symbol</th>
           <th>Shares</th>
-          <th>$P/L</th>
-        </tr>
-        <tr>
-        </tr>
+          <th>Cost</th>
+          <th>Mkt value</th>
+          <th>Gain($)</th>
+          <th>Gain(%)</th>
+        </thead>
+        <tbody id="table_body">
+        </tbody>
       </table>
     </div>
     <hr>
@@ -62,7 +65,7 @@
       <label for="quote_symbol">Enter Stock Symbol:</label>
       <input type="text" name="quote_symbol" id="quote_symbol" />
       <input type="submit" name="submit_quote" id="submit_quote" value="Get Quote" class="btn btn-primary mt-8"
-        onclick="submit_quote()" />
+        onclick="Submit_Quote()" />
 
       <span class="loader text-center" id="loader"></span>
       <span id="quote_status"></span>
@@ -89,7 +92,7 @@
       </div>
       <div>
         <input type="submit" name="submit_trade" id="submit_trade" value="Submit Trade" class="btn btn-primary mt-8"
-          onclick="submit_trade()" />
+          onclick="Submit_Trade()" />
 
         <span class="loader text-center" id="loader"></span>
         <span id="trade_status"></span>

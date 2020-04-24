@@ -2,7 +2,7 @@
  * Set the initial portfolio values
  */
 function initialize() {
-  document.getElementById("balance").innerHTML = "$10,000";
+  document.getElementById("balance").innerHTML = "$10,000.00";
   let loader = document.getElementById("loader");
   loader.style.display = "none";
 
@@ -14,21 +14,21 @@ initialize();
  * Handle the click event on Submit (Generate) button
  */
 document.getElementById("submit_trade").onclick = function () {
-  submit_trade().catch(err => console.error(err));
+  Submit_Trade().catch(err => console.error(err));
 };
 
 /**
  * Handle the click event on Submit (Generate) button
  */
 document.getElementById("submit_quote").onclick = function () {
-  submit_quote().catch(err => console.error(err));
+  Submit_Quote().catch(err => console.error(err));
 };
 
 /**
  * An async function to send the buy/sell request to the backend.
  */
-async function submit_trade() {
-  console.log("In trade submit!");
+async function Submit_Trade() {
+  console.log("In submit trade");
 
   // Set the mouse cursor to hourglass
   document.body.style.cursor = "wait";
@@ -80,52 +80,6 @@ async function submit_trade() {
     console.log("request: ", request);
 
     //  Send an HTTP GET request to the backend
-    let payload = {
-      symbol: symbol,
-      shares: shares
-    };
-    // axios({
-    //   url: request,
-    //   method: 'post',
-    //   data: payload
-    // })
-    //   .then((res) => {
-    //     console.log("post res:", res);
-    //   })
-    //   .catch((error) => {
-    //     console.log(error);
-    //   });
-
-    //     axios.post(request, {
-    //       form: {
-    //         symbol: symbol,
-    //         shares: shares
-    //       }
-    //     }),
-    // headers: {
-    //   "Content-Type", "application/x-www-form-urlencoded"
-    // }
-    //       .then((res) => {
-    //         console.log("post res:", res);
-    //       })
-    //       .catch((error) => {
-    //         console.log(error);
-    //       });
-
-
-    // const data = await axios.post(request,
-    //   {
-    //     symbol: symbol,
-    //     shares: shares
-    //   });
-
-
-    // ; (async () => {
-    //   axios.post(request, {
-    //     symbol: symbol,
-    //     shares: shares
-    //   })
-    // })()
 
     var myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
@@ -141,13 +95,30 @@ async function submit_trade() {
       redirect: 'follow'
     };
 
-    fetch(request, requestOptions)
-      .then(response => response.text())
-      .then(result => console.log(result))
+    await fetch(request, requestOptions)
+      .then(res => res.json())
+      .then(result => {
+        console.log(result);
+        // if backend places order with no error
+        if (result[0].error === "NO_ERROR") {
+          //const portfolio = JSON.stringify(result, null, 2);
+          const portfolio = result.slice();
+          console.log(portfolio);
+          // update front end portfolio table
+          Update_Positions(portfolio);
+        }
+      })
       .catch(error => console.log('error', error));
 
-    // console.log("data.data: ", JSON.stringify(data.data, null, 2));
-    console.log("after post");
+    // const portfolio = await fetch(request, requestOptions)
+    //   .then(res => res.json())
+    //   .then(json => console.log(json))
+    //   .catch(error => console.log('error', error));
+
+
+    // // const data = await axios.get(request);
+
+    // console.log("data.data: ", JSON.stringify(portfolio, null, 2));
 
     // Display the random value
     trade_status_element.innerHTML = "Order placed";
@@ -165,7 +136,7 @@ async function submit_trade() {
 /**
  * An async function to send the quote request to the backend.
  */
-async function submit_quote() {
+async function Submit_Quote() {
   console.log("In submit_quote!");
 
   // Set the mouse cursor to hourglass
@@ -227,4 +198,40 @@ async function submit_quote() {
 
   // Hide loader animation
   loader.style.display = "none";
+}
+
+/**
+ * Update HTML positions table from backend post response 
+ * @param {array} portfolio
+ */
+function Update_Positions(portfolio) {
+  console.log("in Update_Positions()");
+  // update balance
+  console.log(portfolio[1].balance.toLocaleString('us-US', { style: 'currency', currency: 'USD' }));
+  let balance_element = document.getElementById("balance");
+  balance_element.innerHTML = portfolio[1].balance.toLocaleString('us-US', { style: 'currency', currency: 'USD' });
+
+  // update table
+  var positions_table_element = document.getElementById("table_body");
+  positions_table_element.innerHTML = "";
+  for (i = 2; i < portfolio.length; i++) {
+    var row = positions_table_element.insertRow(i - 2);
+    var cell_symbol = row.insertCell(0);
+    var cell_shares = row.insertCell(1);
+    var cell_cost = row.insertCell(2);
+    var cell_market_value = row.insertCell(3);
+    var cell_dollar_gain = row.insertCell(4);
+    var cell_percent_gain = row.insertCell(5);
+
+    cell_symbol.innerHTML = portfolio[i].symbol;
+    cell_shares.innerHTML = portfolio[i].total_shares;
+    cell_cost.innerHTML = portfolio[i].total_cost.toLocaleString('us-US', { style: 'currency', currency: 'USD' });
+    cell_market_value.innerHTML = portfolio[i].market_value.toLocaleString('us-US', { style: 'currency', currency: 'USD' });
+    cell_dollar_gain.innerHTML = (portfolio[i].market_value - portfolio[i].total_cost).toLocaleString('us-US', { style: 'currency', currency: 'USD' });
+    cell_percent_gain.innerHTML = (100 * (portfolio[i].market_value - portfolio[i].total_cost) / portfolio[i].total_cost).toFixed(2) + "%";
+  }
+
+
+
+
 }

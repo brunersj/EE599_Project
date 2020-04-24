@@ -1,8 +1,5 @@
 "use strict";
-// ** to do ** 
-/*
-add balance to portfolio string after buy/sell
-*/
+
 global.fetch = require("node-fetch");
 const express = require("express");
 //var https = require('https');
@@ -13,7 +10,6 @@ app.use(bodyParser.urlencoded({ extended: false }));
 // We need cors middleware to bypass CORS security in browsers.
 const cors = require("cors");
 
-
 app.use(express.static("static"));
 app.use(cors());
 
@@ -21,9 +17,17 @@ let port = 5000;
 
 // initialize account balance to $10000
 
-let cash = 10000;
+let cash = 10000
 
 let portfolio = [];
+let initial_error = {
+  error: "NO_ERROR"
+};
+let balance = {
+  balance: cash
+};
+// portfolio.push(initial_error);
+portfolio.push(balance);
 
 // let stock = {
 //   symbol: "",
@@ -54,8 +58,8 @@ async function getQuote(req_symbol) {
   try {
     var response = await fetch(iex_api_url);
     const json = await response.json();
-    let price = json.quote.iexRealtimePrice.toFixed(2);
-    console.log(json.quote.iexRealtimePrice);
+    let price = Number(json.quote.iexRealtimePrice.toFixed(2));
+    console.log("price: ", price);
     return price;
 
   } catch (err) {
@@ -192,6 +196,7 @@ async function handleBuyPost(req, res, body) {
   let error = "NO_ERROR";
   let req_symbol;
   let price;
+  let cost;
   let req_shares;
   console.log("body: ", JSON.stringify(body));
   // If there was a body (a body string was sent)
@@ -205,28 +210,35 @@ async function handleBuyPost(req, res, body) {
     req_shares = parseInt(body.shares);
     try {
       price = await getQuote(req_symbol);
-
-      if (price * req_shares <= cash) {
-        cash = parseFloat((cash - price * req_shares).toFixed(2));
+      cost = Number((req_shares * price).toFixed(2));
+      // cost = Number(cost);
+      if (cost <= cash) {
+        cash = Number((cash - cost).toFixed(2));
         console.log("cash: ", cash);
-        console.log("cost: ", req_shares * price);
+        console.log("cost: ", cost);
 
         // record purchase to portfolio
 
         // if symbol already exists in portfolio, push # of shares @ price purchased to portfolio
-        if (portfolio.find(o => o.symbol === req_symbol)) {
-          var existing_stock = portfolio.find(o => o.symbol === req_symbol);
 
+        if (portfolio.find(o => o.symbol === req_symbol)) {
+          console.log("symbol found in portfolio");
+          var existing_stock = portfolio.find(obj => obj.symbol === req_symbol);
+          console.log(existing_stock);
           existing_stock.shares.push(req_shares);
-          existing_stock.total_shares.push(existing_stock.total_shares + req_shares);
+          existing_stock.total_shares = (existing_stock.total_shares + req_shares);
           existing_stock.prices.push(price);
+          existing_stock.total_cost += cost;
+          existing_stock.market_value = Number((existing_stock.total_shares * price).toFixed(2));
         } else {
-          // else, add to portfolio
+          // if doesn't exist then add to portfolio
           let stock = {
             symbol: req_symbol,
             shares: [req_shares],
             total_shares: req_shares,
-            prices: [price]
+            prices: [price],
+            total_cost: cost,
+            market_value: cost
           }
           portfolio.push(stock);
         }
@@ -242,9 +254,13 @@ async function handleBuyPost(req, res, body) {
   }
 
   // Generate the output
-  let output = {
+  let output_error = {
     error: error
   };
+  portfolio[0].balance = cash;
+  let output = portfolio.slice();
+  output.splice(0, 0, output_error);
+  // output.shift(output_error);
 
   // Convert output to JSON
   let outputString = JSON.stringify(output, null, 2);
@@ -257,6 +273,7 @@ async function handleBuyPost(req, res, body) {
   res.send(outputString);
 
   portfolioString = JSON.stringify(portfolio, null, 2);
+  console.log("portfolio: ", portfolio);
   console.log("portfolioString: ", portfolioString);
 
 }
@@ -272,6 +289,7 @@ async function handleSellPost(req, res, body) {
   let error = "NO_ERROR";
   let req_symbol;
   let price;
+  let cost;
   let req_shares;
   console.log("body: ", JSON.stringify(body));
   // If there was a body (a body string was sent)
@@ -286,16 +304,20 @@ async function handleSellPost(req, res, body) {
     let req_shares_copy = req_shares;
     try {
       price = await getQuote(req_symbol);
+      cost = Number((price * req_shares).toFixed(2));
+      // cost = Number(cost);
+      // find symbol in portfolio
       if (portfolio.find(o => o.symbol === req_symbol)) {
         //sum of shares of requested symbol:
         var existing_stock = portfolio.find(o => o.symbol === req_symbol);
+        // get sum of total owned shares regardless of buy price
         var sum = existing_stock.shares.reduce(function (a, b) {
           return a + b;
         }, 0);
-        // check if portfolio shares > shares requested to sell 
+        // check if shares owned > shares requested to sell 
         if (sum >= req_shares) {
           while (req_shares > 0) {
-            let sell_shares = existing_stock.shares.pop();
+            let sell_shares = existing_stock.shares.shift();
             if (req_shares >= sell_shares) {
               req_shares = req_shares - sell_shares;
             } else {
@@ -310,8 +332,12 @@ async function handleSellPost(req, res, body) {
           // if there are no more shares then remove stock from portfolio
           if (existing_stock.total_shares == 0) {
             portfolio.splice(portfolio.indexOf(existing_stock), 1);
+          } else {
+            // add total cost and market value
+            existing_stock.total_cost -= cost;
+            existing_stock.market_value = Number((existing_stock.total_shares * price).toFixed(2));
           }
-          cash = parseFloat((cash + price * req_shares_copy).toFixed(2));
+          cash = Number((cash + cost).toFixed(2));
           console.log("cash: ", cash);
         } else { //insufficient shares
           error = "ERROR: insufficient shares to complete sale"
@@ -328,9 +354,14 @@ async function handleSellPost(req, res, body) {
   }
 
   // Generate the output
-  let output = {
+  let output_error = {
     error: error
   };
+  portfolio[0].balance = Number(cash);
+  let output = portfolio.slice();
+  output.splice(0, 0, output_error);
+  // output.shift(output_error);
+
 
   // Convert output to JSON
   let outputString = JSON.stringify(output, null, 2);
@@ -341,7 +372,6 @@ async function handleSellPost(req, res, body) {
 
   // Send it back to the frontend.
   res.send(outputString);
-
   portfolioString = JSON.stringify(portfolio, null, 2);
   console.log("portfolioString: ", portfolioString);
 
