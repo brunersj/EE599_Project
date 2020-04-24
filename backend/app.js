@@ -20,21 +20,11 @@ let port = 5000;
 let cash = 10000
 
 let portfolio = [];
-let initial_error = {
-  error: "NO_ERROR"
-};
 let balance = {
   balance: cash
 };
-// portfolio.push(initial_error);
-portfolio.push(balance);
 
-// let stock = {
-//   symbol: "",
-//   shares: [], (vector of shares that correspond to the shares purchased at the price in the respective index in prices vector)
-//   total_shares: ,
-//   prices: []
-// }
+portfolio.push(balance);
 
 // print portfolio
 let portfolioString = JSON.stringify(portfolio, null, 2);
@@ -211,7 +201,6 @@ async function handleBuyPost(req, res, body) {
     try {
       price = await getQuote(req_symbol);
       cost = Number((req_shares * price).toFixed(2));
-      // cost = Number(cost);
       if (cost <= cash) {
         cash = Number((cash - cost).toFixed(2));
         console.log("cash: ", cash);
@@ -260,7 +249,6 @@ async function handleBuyPost(req, res, body) {
   portfolio[0].balance = cash;
   let output = portfolio.slice();
   output.splice(0, 0, output_error);
-  // output.shift(output_error);
 
   // Convert output to JSON
   let outputString = JSON.stringify(output, null, 2);
@@ -310,7 +298,7 @@ async function handleSellPost(req, res, body) {
       if (portfolio.find(o => o.symbol === req_symbol)) {
         //sum of shares of requested symbol:
         var existing_stock = portfolio.find(o => o.symbol === req_symbol);
-        // get sum of total owned shares regardless of buy price
+        // get sum of total owned shares
         var sum = existing_stock.shares.reduce(function (a, b) {
           return a + b;
         }, 0);
@@ -319,9 +307,9 @@ async function handleSellPost(req, res, body) {
           while (req_shares > 0) {
             let sell_shares = existing_stock.shares.shift();
             if (req_shares >= sell_shares) {
-              req_shares = req_shares - sell_shares;
+              req_shares -= sell_shares;
             } else {
-              sell_shares = sell_shares - req_shares;
+              sell_shares -= req_shares;
               // push front balance of shares not sold
               existing_stock.shares.unshift(sell_shares);
               req_shares = 0;
@@ -360,8 +348,6 @@ async function handleSellPost(req, res, body) {
   portfolio[0].balance = Number(cash);
   let output = portfolio.slice();
   output.splice(0, 0, output_error);
-  // output.shift(output_error);
-
 
   // Convert output to JSON
   let outputString = JSON.stringify(output, null, 2);

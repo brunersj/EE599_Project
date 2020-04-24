@@ -3,8 +3,10 @@
  */
 function initialize() {
   document.getElementById("balance").innerHTML = "$10,000.00";
-  let loader = document.getElementById("loader");
-  loader.style.display = "none";
+  let quote_loader = document.getElementById("quote_loader");
+  quote_loader.style.display = "none";
+  let trade_loader = document.getElementById("trade_loader");
+  trade_loader.style.display = "none";
 
 }
 
@@ -44,8 +46,8 @@ async function Submit_Trade() {
   trade_status_element.innerHTML = "Please wait...";
 
   // Show the loader element (spinning wheels)
-  let loader = document.getElementById("loader");
-  loader.style.display = "inline-block";
+  let trade_loader = document.getElementById("trade_loader");
+  trade_loader.style.display = "inline-block";
   // get value from trade type radio buttons
   try {
     // check if and only one trade type is selected with XOR
@@ -130,7 +132,7 @@ async function Submit_Trade() {
   document.body.style.cursor = "default";
 
   // Hide loader animation
-  loader.style.display = "none";
+  trade_loader.style.display = "none";
 }
 
 /**
@@ -150,8 +152,8 @@ async function Submit_Quote() {
 
 
   // Show the loader element (spinning wheels)
-  let loader = document.getElementById("loader");
-  loader.style.display = "inline-block";
+  let quote_loader = document.getElementById("quote_loader");
+  quote_loader.style.display = "inline-block";
   try {
     if (symbol === "") {
       throw new Error("No symbol entered");
@@ -197,7 +199,7 @@ async function Submit_Quote() {
   document.body.style.cursor = "default";
 
   // Hide loader animation
-  loader.style.display = "none";
+  quote_loader.style.display = "none";
 }
 
 /**
@@ -230,8 +232,4 @@ function Update_Positions(portfolio) {
     cell_dollar_gain.innerHTML = (portfolio[i].market_value - portfolio[i].total_cost).toLocaleString('us-US', { style: 'currency', currency: 'USD' });
     cell_percent_gain.innerHTML = (100 * (portfolio[i].market_value - portfolio[i].total_cost) / portfolio[i].total_cost).toFixed(2) + "%";
   }
-
-
-
-
 }
