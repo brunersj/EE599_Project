@@ -17,11 +17,13 @@ let port = 5000;
 
 // initialize account balance to $10000
 
-let cash = 10000
+let cash = 10000;
+let stock_value = 0;
 
 let portfolio = [];
 let balance = {
-  balance: cash
+  cash: cash,
+  stock_value: stock_value
 };
 
 portfolio.push(balance);
@@ -48,9 +50,16 @@ async function getQuote(req_symbol) {
   try {
     var response = await fetch(iex_api_url);
     const json = await response.json();
+    console.log(json);
     let price = Number(json.quote.iexRealtimePrice.toFixed(2));
+    let company_name = json.quote.companyName;
+    console.log("companyName: ", company_name);
     console.log("price: ", price);
-    return price;
+    let return_obj = {
+      company_name: company_name,
+      price: price
+    };
+    return return_obj;
 
   } catch (err) {
     console.log(response.status);
@@ -135,6 +144,7 @@ async function handleQuoteGet(req, res, query) {
   let error = "NO_ERROR";
   let req_symbol;
   let price;
+  let company_name;
   console.log("query: ", JSON.stringify(query));
   // If there was a query (a query string was sent)
   if (
@@ -144,7 +154,9 @@ async function handleQuoteGet(req, res, query) {
     console.log("This is a quote query");
     req_symbol = query.symbol.toUpperCase();
     try {
-      price = await getQuote(req_symbol);
+      const quote = await getQuote(req_symbol);
+      price = quote.price;
+      company_name = quote.company_name;
     } catch (err) {
       console.log("Error from catch:" + err);
       error = "" + err;
@@ -156,6 +168,7 @@ async function handleQuoteGet(req, res, query) {
 
   // Generate the output
   let output = {
+    company_name: company_name,
     symbol: req_symbol,
     price: price,
     error: error
@@ -199,7 +212,9 @@ async function handleBuyPost(req, res, body) {
     req_symbol = body.symbol.toUpperCase();
     req_shares = parseInt(body.shares);
     try {
-      price = await getQuote(req_symbol);
+      const quote = await getQuote(req_symbol);
+      price = quote.price;
+      const company_name = quote.company_name;
       cost = Number((req_shares * price).toFixed(2));
       if (cost <= cash) {
         cash = Number((cash - cost).toFixed(2));
@@ -222,6 +237,7 @@ async function handleBuyPost(req, res, body) {
         } else {
           // if doesn't exist then add to portfolio
           let stock = {
+            company_name: company_name,
             symbol: req_symbol,
             shares: [req_shares],
             total_shares: req_shares,
@@ -246,7 +262,8 @@ async function handleBuyPost(req, res, body) {
   let output_error = {
     error: error
   };
-  portfolio[0].balance = cash;
+  portfolio[0].cash = Number(cash);
+  portfolio[0].stock_value += Number(cost);
   let output = portfolio.slice();
   output.splice(0, 0, output_error);
 
@@ -291,7 +308,8 @@ async function handleSellPost(req, res, body) {
     req_shares = parseInt(body.shares);
     let req_shares_copy = req_shares;
     try {
-      price = await getQuote(req_symbol);
+      const quote = await getQuote(req_symbol);
+      price = quote.price;
       cost = Number((price * req_shares).toFixed(2));
       // cost = Number(cost);
       // find symbol in portfolio
@@ -345,7 +363,8 @@ async function handleSellPost(req, res, body) {
   let output_error = {
     error: error
   };
-  portfolio[0].balance = Number(cash);
+  portfolio[0].cash = Number(cash);
+  portfolio[0].stock_value -= Number(cost);
   let output = portfolio.slice();
   output.splice(0, 0, output_error);
 

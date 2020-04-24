@@ -2,7 +2,9 @@
  * Set the initial portfolio values
  */
 function initialize() {
-  document.getElementById("balance").innerHTML = "$10,000.00";
+  document.getElementById("cash").innerHTML = "$10,000.00";
+  document.getElementById("account_value").innerHTML = "$10,000.00";
+  document.getElementById("stock_value").innerHTML = "$0.00";
   let quote_loader = document.getElementById("quote_loader");
   quote_loader.style.display = "none";
   let trade_loader = document.getElementById("trade_loader");
@@ -42,7 +44,7 @@ async function Submit_Trade() {
   let sell_select_element = document.getElementById("sell_select");
   let symbol = document.getElementById("trade_symbol").value;
   let shares = document.getElementById("trade_shares").value;
-
+  let portfolio = [];
   trade_status_element.innerHTML = "Please wait...";
 
   // Show the loader element (spinning wheels)
@@ -101,30 +103,30 @@ async function Submit_Trade() {
       .then(res => res.json())
       .then(result => {
         console.log(result);
+
+        portfolio = result.slice();
+        console.log(portfolio);
         // if backend places order with no error
         if (result[0].error === "NO_ERROR") {
           //const portfolio = JSON.stringify(result, null, 2);
-          const portfolio = result.slice();
-          console.log(portfolio);
+
           // update front end portfolio table
           Update_Positions(portfolio);
         }
       })
-      .catch(error => console.log('error', error));
+      .catch(error => {
+        console.log('error', error);
+        throw new Error(error);
+      });
 
-    // const portfolio = await fetch(request, requestOptions)
-    //   .then(res => res.json())
-    //   .then(json => console.log(json))
-    //   .catch(error => console.log('error', error));
-
-
-    // // const data = await axios.get(request);
-
-    // console.log("data.data: ", JSON.stringify(portfolio, null, 2));
-
-    // Display the random value
-    trade_status_element.innerHTML = "Order placed";
-
+    console.log("error: ", portfolio[0].error);
+    // read error value from backend and display trade status
+    if (portfolio[0].error === "NO_ERROR") {
+      trade_status_element.innerHTML = "Order sucessfully placed";
+    }
+    else {
+      trade_status_element.innerHTML = portfolio[0].error;
+    }
   } catch (err) {
     trade_status_element.innerHTML = err;
   }
@@ -147,13 +149,14 @@ async function Submit_Quote() {
   // Accessing the div that has quote elements 
   let quote_status_element = document.getElementById("quote_status");
   let quote_price_element = document.getElementById("quote_price");
+  let quote_company_name_element = document.getElementById("quote_company_name_element");
   let symbol = document.getElementById("quote_symbol").value;
   quote_status_element.innerHTML = "Please wait...";
-
 
   // Show the loader element (spinning wheels)
   let quote_loader = document.getElementById("quote_loader");
   quote_loader.style.display = "inline-block";
+
   try {
     if (symbol === "") {
       throw new Error("No symbol entered");
@@ -168,11 +171,12 @@ async function Submit_Quote() {
 
         console.log("data.data: ", JSON.stringify(data.data, null, 2));
 
-        // read error value from backend
+        // read error value from backend and display quote status
         if (data.data.error === "NO_ERROR") {
           // Display the quote value
           quote_price_element.innerHTML = "$" + data.data.price;
-          quote_status_element.innerHTML = "Quote recieved";
+          quote_company_name_element.innerHTML = "" + data.data.company_name;
+          quote_status_element.innerHTML = "Quote sucessfully recieved";
         }
         else {
           if (data.data.error === "Error: 404") {
@@ -209,22 +213,27 @@ async function Submit_Quote() {
 function Update_Positions(portfolio) {
   console.log("in Update_Positions()");
   // update balance
-  console.log(portfolio[1].balance.toLocaleString('us-US', { style: 'currency', currency: 'USD' }));
-  let balance_element = document.getElementById("balance");
-  balance_element.innerHTML = portfolio[1].balance.toLocaleString('us-US', { style: 'currency', currency: 'USD' });
-
+  console.log(portfolio[1].cash.toLocaleString('us-US', { style: 'currency', currency: 'USD' }));
+  let cash_element = document.getElementById("cash");
+  let stock_value_element = document.getElementById("stock_value");
+  let account_value_element = document.getElementById("account_value");
+  cash_element.innerHTML = portfolio[1].cash.toLocaleString('us-US', { style: 'currency', currency: 'USD' });
+  stock_value_element.innerHTML = portfolio[1].stock_value.toLocaleString('us-US', { style: 'currency', currency: 'USD' });
+  account_value_element.innerHTML = (portfolio[1].cash + portfolio[1].stock_value).toLocaleString('us-US', { style: 'currency', currency: 'USD' });
   // update table
   var positions_table_element = document.getElementById("table_body");
   positions_table_element.innerHTML = "";
   for (i = 2; i < portfolio.length; i++) {
     var row = positions_table_element.insertRow(i - 2);
-    var cell_symbol = row.insertCell(0);
-    var cell_shares = row.insertCell(1);
-    var cell_cost = row.insertCell(2);
-    var cell_market_value = row.insertCell(3);
-    var cell_dollar_gain = row.insertCell(4);
-    var cell_percent_gain = row.insertCell(5);
+    var cell_company_name = row.insertCell(0);
+    var cell_symbol = row.insertCell(1);
+    var cell_shares = row.insertCell(2);
+    var cell_cost = row.insertCell(3);
+    var cell_market_value = row.insertCell(4);
+    var cell_dollar_gain = row.insertCell(5);
+    var cell_percent_gain = row.insertCell(6);
 
+    cell_company_name.innerHTML = portfolio[i].company_name;
     cell_symbol.innerHTML = portfolio[i].symbol;
     cell_shares.innerHTML = portfolio[i].total_shares;
     cell_cost.innerHTML = portfolio[i].total_cost.toLocaleString('us-US', { style: 'currency', currency: 'USD' });
