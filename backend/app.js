@@ -44,13 +44,13 @@ const delay = function (t) {
  * Get stock quote from IEX API
  * @param {String} req_symbol
  */
-async function getQuote(req_symbol) {
+async function GetQuote(req_symbol) {
   const iex_key = 'pk_a8ed94273cbb45918ade3846ab74bb26';
   const iex_api_url = `https://cloud.iexapis.com/stable/stock/${req_symbol}/batch?types=quote&token=${iex_key}`;
   try {
     var response = await fetch(iex_api_url);
     const json = await response.json();
-    console.log(json);
+    // console.log(json);
     let price = Number(json.quote.iexRealtimePrice.toFixed(2));
     let company_name = json.quote.companyName;
     console.log("companyName: ", company_name);
@@ -100,6 +100,14 @@ HTTP CODE	TYPE	            DESCRIPTION
 
 
 /**
+ * route get request to /refresh path
+ */
+app.get("/refresh", async function (req, res, next) {
+  console.log("I got a query!");
+  handleRefreshGet(res, res, req.query);
+});
+
+/**
  * route get request to /quote path
  */
 app.get("/quote", async function (req, res, next) {
@@ -135,6 +143,58 @@ app.listen(port, err => {
 
 //-----------------------------------------------------------------------------
 /**
+ * Handles a Get request for refresh
+ * @param {Object} req 
+ * @param {Object} res 
+ * @param {Object} query 
+ */
+async function handleRefreshGet(req, res, query) {
+  // *** to do ***
+  // fix error handling
+  // stock value is undefined?? why
+  console.log("in handle refresh get");
+  let error = "NO_ERROR";
+  let new_stock_value = 0;
+
+  try {
+    if (portfolio.length < 2) {
+      throw new Error("No stocks in portfolio to refresh");
+    }
+    for (let i = 1; i < portfolio.length; i++) {
+      const req_symbol = portfolio[i].symbol;
+      const quote = await GetQuote(req_symbol);
+      const price = quote.price;
+      const new_market_value = Number(price * portfolio[i].total_shares).toFixed(2);
+      portfolio[i].market_value = new_market_value;
+      new_stock_value += Number(new_market_value);
+    }
+    console.log("new stock value: ", new_stock_value);
+    portfolio[0].stock_value = new_stock_value;
+  } catch (err) {
+    console.log(err);
+    error = err;
+  }
+
+  // Generate the output
+  let output_error = {
+    error: error
+  };
+  let output = portfolio.slice();
+  output.splice(0, 0, output_error);
+
+  // Convert output to JSON
+  let outputString = JSON.stringify(output, null, 2);
+  console.log("outputString: ", outputString);
+
+  // Let's generate some artificial delay!
+  await delay(2000);
+
+  // Send it back to the frontend.
+  res.send(outputString);
+}
+
+//-----------------------------------------------------------------------------
+/**
  * Handles a Get request for quote
  * @param {Object} req 
  * @param {Object} res 
@@ -154,7 +214,7 @@ async function handleQuoteGet(req, res, query) {
     console.log("This is a quote query");
     req_symbol = query.symbol.toUpperCase();
     try {
-      const quote = await getQuote(req_symbol);
+      const quote = await GetQuote(req_symbol);
       price = quote.price;
       company_name = quote.company_name;
     } catch (err) {
@@ -212,7 +272,7 @@ async function handleBuyPost(req, res, body) {
     req_symbol = body.symbol.toUpperCase();
     req_shares = parseInt(body.shares);
     try {
-      const quote = await getQuote(req_symbol);
+      const quote = await GetQuote(req_symbol);
       price = quote.price;
       const company_name = quote.company_name;
       cost = Number((req_shares * price).toFixed(2));
@@ -308,7 +368,7 @@ async function handleSellPost(req, res, body) {
     req_shares = parseInt(body.shares);
     let req_shares_copy = req_shares;
     try {
-      const quote = await getQuote(req_symbol);
+      const quote = await GetQuote(req_symbol);
       price = quote.price;
       cost = Number((price * req_shares).toFixed(2));
       // cost = Number(cost);

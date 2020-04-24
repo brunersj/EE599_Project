@@ -9,24 +9,150 @@ function initialize() {
   quote_loader.style.display = "none";
   let trade_loader = document.getElementById("trade_loader");
   trade_loader.style.display = "none";
+  let refresh_loader = document.getElementById("refresh_loader");
+  refresh_loader.style.display = "none";
 
 }
 
 initialize();
 
 /**
- * Handle the click event on Submit (Generate) button
+ * Handle the click event on place order button
  */
 document.getElementById("submit_trade").onclick = function () {
   Submit_Trade().catch(err => console.error(err));
 };
 
 /**
- * Handle the click event on Submit (Generate) button
+ * Handle the click event on get quote button
  */
 document.getElementById("submit_quote").onclick = function () {
   Submit_Quote().catch(err => console.error(err));
 };
+
+/**
+ * Handle the click event on refresh portfolio button
+ */
+document.getElementById("submit_refresh").onclick = function () {
+  Submit_Refresh().catch(err => console.error(err));
+};
+
+/**
+ * An async function to send the refresh request to the backend.
+ */
+async function Submit_Refresh() {
+  console.log("In submit_quote!");
+
+  let refresh_status_element = document.getElementById("refresh_status");
+  refresh_status_element.innerHTML = "Please wait...";
+  // Set the mouse cursor to hourglass
+  document.body.style.cursor = "wait";
+  // Show the loader element (spinning wheels)
+  let refresh_loader = document.getElementById("refresh_loader");
+  refresh_loader.style.display = "inline-block";
+
+  try {
+    let request = `http://127.0.0.1:5000/refresh`;
+    console.log("request: ", request);
+
+    // Send an HTTP GET request to the backend
+    const data = await axios.get(request);
+    console.log("data:", data);
+    console.log("data.data: ", JSON.stringify(data.data, null, 2));
+
+    // read error value from backend and display quote status
+    if (data.data[0].error === "NO_ERROR") {
+      Update_Positions(data.data);
+    } else {
+      refresh_status_element.innerHTML = data.data[0].error;
+    }
+
+  } catch (error) {
+    console.log("error: ", error);
+    refresh_status_element.innerHTML = error;
+    throw new Error(error);
+  }
+
+  // refresh_status_element.innerHTML = "Last updated: " + getDateTime();
+  // Set the cursor back to default
+  document.body.style.cursor = "default";
+
+  // Hide loader animation
+  refresh_loader.style.display = "none";
+}
+
+
+/**
+ * An async function to send the quote request to the backend.
+ */
+async function Submit_Quote() {
+  console.log("In submit_quote!");
+
+  // Set the mouse cursor to hourglass
+  document.body.style.cursor = "wait";
+
+  // Accessing the div that has quote elements 
+  let quote_status_element = document.getElementById("quote_status");
+  let quote_price_element = document.getElementById("quote_price");
+  let quote_company_name_element = document.getElementById("quote_company_name");
+  let symbol = document.getElementById("quote_symbol").value;
+  quote_status_element.innerHTML = "Please wait...";
+
+  // Show the loader element (spinning wheels)
+  let quote_loader = document.getElementById("quote_loader");
+  quote_loader.style.display = "inline-block";
+
+  try {
+    if (symbol === "") {
+      throw new Error("No symbol entered");
+    } else {
+      try {
+        // Get the symbol from the user 
+        let request = `http://127.0.0.1:5000/quote/?symbol=${symbol}`;
+        console.log("request: ", request);
+
+        // Send an HTTP GET request to the backend
+        const data = await axios.get(request);
+
+        console.log("data.data: ", JSON.stringify(data.data, null, 2));
+
+        // read error value from backend and display quote status
+        if (data.data.error === "NO_ERROR") {
+          // Display the quote value
+          quote_price_element.innerHTML = "$" + data.data.price;
+          quote_company_name_element.innerHTML = data.data.company_name;
+          quote_status_element.innerHTML = "Quote sucessfully received at: " + getDateTime();
+        }
+        else {
+          if (data.data.error === "Error: 404") {
+            quote_company_name_element.innerHTML = "";
+            quote_price_element.innerHTML = "";
+            quote_status_element.innerHTML = "Unknown symbol provided";
+          } else {
+            quote_company_name_element.innerHTML = "";
+            quote_price_element.innerHTML = "";
+            quote_status_element.innerHTML = data.data.error;
+          }
+        }
+      } catch (error) {
+        console.log("error: ", error);
+        throw new Error(error);
+      }
+    }
+  } catch (err) {
+    quote_company_name_element.innerHTML = "";
+    quote_price_element.innerHTML = "";
+    quote_status_element.innerHTML = err;
+  }
+
+
+
+  // Set the cursor back to default
+  document.body.style.cursor = "default";
+
+  // Hide loader animation
+  quote_loader.style.display = "none";
+}
 
 /**
  * An async function to send the buy/sell request to the backend.
@@ -122,7 +248,7 @@ async function Submit_Trade() {
     console.log("error: ", portfolio[0].error);
     // read error value from backend and display trade status
     if (portfolio[0].error === "NO_ERROR") {
-      trade_status_element.innerHTML = "Order sucessfully placed";
+      trade_status_element.innerHTML = "Order sucessfully placed at: " + getDateTime();
     }
     else {
       trade_status_element.innerHTML = portfolio[0].error;
@@ -135,75 +261,6 @@ async function Submit_Trade() {
 
   // Hide loader animation
   trade_loader.style.display = "none";
-}
-
-/**
- * An async function to send the quote request to the backend.
- */
-async function Submit_Quote() {
-  console.log("In submit_quote!");
-
-  // Set the mouse cursor to hourglass
-  document.body.style.cursor = "wait";
-
-  // Accessing the div that has quote elements 
-  let quote_status_element = document.getElementById("quote_status");
-  let quote_price_element = document.getElementById("quote_price");
-  let quote_company_name_element = document.getElementById("quote_company_name_element");
-  let symbol = document.getElementById("quote_symbol").value;
-  quote_status_element.innerHTML = "Please wait...";
-
-  // Show the loader element (spinning wheels)
-  let quote_loader = document.getElementById("quote_loader");
-  quote_loader.style.display = "inline-block";
-
-  try {
-    if (symbol === "") {
-      throw new Error("No symbol entered");
-    } else {
-      try {
-        // Get the symbol from the user 
-        let request = `http://127.0.0.1:5000/quote/?symbol=${symbol}`;
-        console.log("request: ", request);
-
-        // Send an HTTP GET request to the backend
-        const data = await axios.get(request);
-
-        console.log("data.data: ", JSON.stringify(data.data, null, 2));
-
-        // read error value from backend and display quote status
-        if (data.data.error === "NO_ERROR") {
-          // Display the quote value
-          quote_price_element.innerHTML = "$" + data.data.price;
-          quote_company_name_element.innerHTML = "" + data.data.company_name;
-          quote_status_element.innerHTML = "Quote sucessfully recieved";
-        }
-        else {
-          if (data.data.error === "Error: 404") {
-            quote_price_element.innerHTML = "";
-            quote_status_element.innerHTML = "Unknown symbol provided";
-          } else {
-            quote_price_element.innerHTML = "";
-            quote_status_element.innerHTML = data.data.error;
-          }
-        }
-      } catch (error) {
-        console.log("error: ", error);
-        throw new Error(error)
-      }
-    }
-  } catch (err) {
-    quote_price_element.innerHTML = "";
-    quote_status_element.innerHTML = err;
-  }
-
-
-
-  // Set the cursor back to default
-  document.body.style.cursor = "default";
-
-  // Hide loader animation
-  quote_loader.style.display = "none";
 }
 
 /**
@@ -240,5 +297,33 @@ function Update_Positions(portfolio) {
     cell_market_value.innerHTML = portfolio[i].market_value.toLocaleString('us-US', { style: 'currency', currency: 'USD' });
     cell_dollar_gain.innerHTML = (portfolio[i].market_value - portfolio[i].total_cost).toLocaleString('us-US', { style: 'currency', currency: 'USD' });
     cell_percent_gain.innerHTML = (100 * (portfolio[i].market_value - portfolio[i].total_cost) / portfolio[i].total_cost).toFixed(2) + "%";
+
+    let refresh_status_element = document.getElementById("refresh_status");
+    refresh_status_element.innerHTML = "Last updated: " + getDateTime();
   }
+}
+
+function getDateTime() {
+
+  var date = new Date();
+
+  var hour = date.getHours();
+  hour = (hour < 10 ? "0" : "") + hour;
+
+  var min = date.getMinutes();
+  min = (min < 10 ? "0" : "") + min;
+
+  var sec = date.getSeconds();
+  sec = (sec < 10 ? "0" : "") + sec;
+
+  var year = date.getFullYear();
+
+  var month = date.getMonth() + 1;
+  month = (month < 10 ? "0" : "") + month;
+
+  var day = date.getDate();
+  day = (day < 10 ? "0" : "") + day;
+
+  return year + ":" + month + ":" + day + " @ " + hour + ":" + min + ":" + sec;
+
 }

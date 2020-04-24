@@ -69,7 +69,13 @@
       <tbody id="table_body">
       </tbody>
     </table>
+    <div>
+      <input type="submit" name="submit_refresh" id="submit_refresh" value="Refresh Portfolio"
+        class="btn btn-primary mt-8" onclick="Submit_Refresh()" />
 
+      <span class="loader text-center" id="refresh_loader"></span>
+      <span id="refresh_status"></span>
+    </div>
     <hr>
     <h4 style="text-align: left;">Get Quote</h4>
     <div>
@@ -82,7 +88,10 @@
       <span id="quote_status"></span>
 
     </div>
-
+    <div>
+      <label for="quote_company_name">Company Name:</label>
+      <span id="quote_company_name"></span>
+    </div>
     <div>
       <label for="quote_price">Latest Price Per Share:</label>
       <span id="quote_price"></span>
