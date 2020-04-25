@@ -2,7 +2,6 @@
 
 global.fetch = require("node-fetch");
 const express = require("express");
-//var https = require('https');
 const app = express();
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -15,8 +14,10 @@ app.use(cors());
 
 let port = 5000;
 
-// initialize account balance to $10000
+// IEX Cloud API Key *** Change to your own key *** 
+const iex_key = 'pk_a8ed94273cbb45918ade3846ab74bb26';
 
+// initialize account balance to $10000
 let cash = 10000;
 let stock_value = 0;
 
@@ -45,7 +46,7 @@ const delay = function (t) {
  * @param {String} req_symbol
  */
 async function GetQuote(req_symbol) {
-  const iex_key = 'pk_a8ed94273cbb45918ade3846ab74bb26';
+
   const iex_api_url = `https://cloud.iexapis.com/stable/stock/${req_symbol}/batch?types=quote&token=${iex_key}`;
   try {
     var response = await fetch(iex_api_url);
