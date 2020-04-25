@@ -13,7 +13,7 @@ This project requirement was to develop a complete software solution for an indu
 
 - The backend is a NodeJS server that processes the HTTP GET and HTTP POST requests based on four route paths:
   1. `/refresh`:
-        The backend will update the portfolio and account values based on the most recent quotes of each stock in the portfolio. The backend responds to the frontend with these updates.
+      - The backend will update the portfolio and account values based on the most recent quotes of each stock in the portfolio. The backend responds to the frontend with these updates.
   2. `/quote`:
       - The backend will query the IEX Cloud API with the `req_symbol`. If the symbol is valid, the IEX Cloud API will return a quote for the symbol including the current price per share. The backend responds to the frontend with this value and the full stock name.
   3. `/buy`:
