@@ -1,7 +1,9 @@
 # EE599 Final Project - Mock Stock 
 Stock Market Simulator
 
-This project requirement was to develop a complete software solution for an industrial problem. I designed a fullstack project for mock stock market simulation called Mock Stock. 
+This project requirement was to develop a complete software solution for an industrial problem. I designed a fullstack project for mock stock market trading using real-time market data called Mock Stock. 
+
+<img alt="highlevel_workflow" src="https://github.com/brunersj/EE599_Project/blob/master/highlevelWorkflowScreenshot.png?raw=true" width="400">
 
 - The frontend is a web page broken into three parts.
   1. Balances and Positions:
@@ -10,6 +12,8 @@ This project requirement was to develop a complete software solution for an indu
       - A user can enter a stock symbol, and it is sent to the backend using HTTP GET request. The backend responds with the current stock price and full company name.
   3. Initiate New Trade:
       - A user can choose to buy / sell `x` shares of `y` company given there are sufficient funds in the account. The frontend sends theses parameters to the backend using an HTTP POST request. If a buy is placed, the backend increases shares of this stock in the portfolio and credits the cash account for the transaction. If a sell is placed, the backend reduces shares of this stock in the portfolio and debits the cash account for the transaction. In both cases, the backend responds with the updated portfolio array that is processed and displayed by the frontend.
+
+<img alt="workflow" src="https://github.com/brunersj/EE599_Project/blob/master/workflowScreenshot.png?raw=true" width="400">
 
 - The backend is a NodeJS server that processes the HTTP GET and HTTP POST requests based on four route paths:
   1. `/refresh`:
