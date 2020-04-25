@@ -3,7 +3,7 @@ Stock Market Simulator
 
 This project requirement was to develop a complete software solution for an industrial problem. I designed a fullstack project for mock stock market trading using real-time market data called Mock Stock. 
 
-<img alt="highlevel_workflow" src="https://github.com/brunersj/EE599_Project/blob/master/highlevelWorkflowScreenshot.png?raw=true" width="500" text-align="center">
+<img alt="highlevel_workflow" src="https://github.com/brunersj/EE599_Project/blob/master/highlevelWorkflowScreenshot.png?raw=true" width="600" text-align="center">
 
 - The frontend is a web page broken into three parts.
   1. Balances and Positions:
@@ -13,7 +13,7 @@ This project requirement was to develop a complete software solution for an indu
   3. Initiate New Trade:
       - A user can choose to buy / sell `x` shares of `y` company given there are sufficient funds in the account. The frontend sends theses parameters to the backend using an HTTP POST request. If a buy is placed, the backend increases shares of this stock in the portfolio and credits the cash account for the transaction. If a sell is placed, the backend reduces shares of this stock in the portfolio and debits the cash account for the transaction. In both cases, the backend responds with the updated portfolio array that is processed and displayed by the frontend.
 
-<img alt="workflow" src="https://github.com/brunersj/EE599_Project/blob/master/workflowScreenshot.png?raw=true" width="400">
+<img alt="workflow" src="https://github.com/brunersj/EE599_Project/blob/master/workflowScreenshot.png?raw=true" width="500">
 
 - The backend is a NodeJS server that processes the HTTP GET and HTTP POST requests based on four route paths:
   1. `/refresh`:
@@ -51,7 +51,7 @@ node app.js
 
 You can test backend by installing and running [Postman](https://www.postman.com/downloads/):
 
-<img alt="Backend" src="https://github.com/brunersj/EE599_Project/blob/master/backend/screenshot.png?raw=true" width="400">
+<img alt="Backend" src="https://github.com/brunersj/EE599_Project/blob/master/backend/screenshot.png?raw=true" width="700">
 
 
 ## Running Frontend:
@@ -62,7 +62,7 @@ node app.js
 
 Then open your browser to http://localhost:3000:
 
-<img alt="Frontend" src="https://github.com/brunersj/EE599_Project/blob/master/frontend/screenshot.png?raw=true" width="400">
+<img alt="Frontend" src="https://github.com/brunersj/EE599_Project/blob/master/frontend/screenshot.png?raw=true" width="700">
 
 ## Youtube Demo Video:
 https://youtu.be/nQwhy5yjFCw
