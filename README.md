@@ -39,6 +39,7 @@ npm install
 ```
 
 ## Running Backend:
+Register with [IEX Cloud](https://iexcloud.io) to generate your own API Token. Replace `iex_key` in `/backend/app.js` with your API Token.
 ```bash
 cd backend
 node app.js
