@@ -3,7 +3,7 @@ Stock Market Simulator
 
 This project requirement was to develop a complete software solution for an industrial problem. I designed a fullstack project for mock stock market trading using real-time market data called Mock Stock. 
 
-<img alt="highlevel_workflow" src="https://github.com/brunersj/EE599_Project/blob/master/highlevelWorkflowScreenshot.png?raw=true" width="400">
+<img alt="highlevel_workflow" src="https://github.com/brunersj/EE599_Project/blob/master/highlevelWorkflowScreenshot.png?raw=true" width="500" text-align="center">
 
 - The frontend is a web page broken into three parts.
   1. Balances and Positions:
