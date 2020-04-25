@@ -5,21 +5,21 @@ This project requirement was to develop a complete software solution for an indu
 
 - The frontend is a web page broken into three parts.
   1. Balances and Positions:
-      The current portfolio balances are displayed as well as a table providing a breakdown of each stock in the portfolio. This table includes relevant information such as number of shares owned, current market value, dollar and percent gain, etc. This information can be reloaded using a refresh button that sends an HTTP GET request to the backend. The backend responds with the portfolio array that is processed and displayed by the frontend.
-  2. Get Quote
-      A user can enter a stock symbol, and it is sent to the backend using HTTP GET request. The backend responds with the current stock price and full company name.
-  3. Initiate New Trade
-      A user can choose to buy / sell `x` shares of `y` company given there are sufficient funds in the account. The frontend sends theses parameters to the backend using an HTTP POST request. If a buy is placed, the backend increases shares of this stock in the portfolio and credits the cash account for the transaction. If a sell is placed, the backend reduces shares of this stock in the portfolio and debits the cash account for the transaction. In both cases, the backend responds with the updated portfolio array that is processed and displayed by the frontend.
+      - The current portfolio balances are displayed as well as a table providing a breakdown of each stock in the portfolio. This table includes relevant information such as number of shares owned, current market value, dollar and percent gain, etc. This information can be reloaded using a refresh button that sends an HTTP GET request to the backend. The backend responds with the portfolio array that is processed and displayed by the frontend.
+  2. Get Quote:
+      - A user can enter a stock symbol, and it is sent to the backend using HTTP GET request. The backend responds with the current stock price and full company name.
+  3. Initiate New Trade:
+      - A user can choose to buy / sell `x` shares of `y` company given there are sufficient funds in the account. The frontend sends theses parameters to the backend using an HTTP POST request. If a buy is placed, the backend increases shares of this stock in the portfolio and credits the cash account for the transaction. If a sell is placed, the backend reduces shares of this stock in the portfolio and debits the cash account for the transaction. In both cases, the backend responds with the updated portfolio array that is processed and displayed by the frontend.
 
 - The backend is a NodeJS server that processes the HTTP GET and HTTP POST requests based on four route paths:
   1. `/refresh`:
-      The backend will update the portfolio and account values based on the most recent quotes of each stock in the portfolio. The backend responds to the frontend with these updates.
+        The backend will update the portfolio and account values based on the most recent quotes of each stock in the portfolio. The backend responds to the frontend with these updates.
   2. `/quote`:
-      The backend will query the IEX Cloud API with the `req_symbol`. If the symbol is valid, the IEX Cloud API will return a quote for the symbol including the current price per share. The backend responds to the frontend with this value and the full stock name.
-  3. `buy`:
-      The backend retrieves the updated share price, calculates the cost of the transactions, and adds these shares to the portfolio if there are sufficient funds in the account. The backend responds to the frontend with the updated portfolio.
-  4. `sell`:
-      The backend retrieves the updated share price, calculates the cost of the transactions, and deducts these shares from the portfolio if there are sufficient funds in the account. The backend responds to the frontend with the updated portfolio.
+      - The backend will query the IEX Cloud API with the `req_symbol`. If the symbol is valid, the IEX Cloud API will return a quote for the symbol including the current price per share. The backend responds to the frontend with this value and the full stock name.
+  3. `/buy`:
+      - The backend retrieves the updated share price, calculates the cost of the transactions, and adds these shares to the portfolio if there are sufficient funds in the account. The backend responds to the frontend with the updated portfolio.
+  4. `/sell`:
+      - The backend retrieves the updated share price, calculates the cost of the transactions, and deducts these shares from the portfolio if there are sufficient funds in the account. The backend responds to the frontend with the updated portfolio.
 
 
 By default frontend listens on port 3000, and backend listens on port 5000.
