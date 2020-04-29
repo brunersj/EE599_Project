@@ -41,7 +41,7 @@ document.getElementById("submit_refresh").onclick = function () {
  * An async function to send the refresh request to the backend.
  */
 async function Submit_Refresh() {
-  console.log("In submit_quote!");
+  console.log("In submit_Refresh!");
 
   let refresh_status_element = document.getElementById("refresh_status");
   refresh_status_element.innerHTML = "Please wait...";
@@ -60,7 +60,7 @@ async function Submit_Refresh() {
     console.log("data:", data);
     console.log("data.data: ", JSON.stringify(data.data, null, 2));
 
-    // read error value from backend and display quote status
+    // read error value from backend and display refresh status
     if (data.data[0].error === "NO_ERROR") {
       Update_Positions(data.data);
     } else {
@@ -119,7 +119,7 @@ async function Submit_Quote() {
         // read error value from backend and display quote status
         if (data.data.error === "NO_ERROR") {
           // Display the quote value
-          quote_price_element.innerHTML = "$" + data.data.price;
+          quote_price_element.innerHTML = data.data.price.toLocaleString('us-US', { style: 'currency', currency: 'USD' });
           quote_company_name_element.innerHTML = data.data.company_name;
           quote_status_element.innerHTML = "Quote sucessfully received at: " + getDateTime();
         }
