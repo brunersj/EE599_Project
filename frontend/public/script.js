@@ -74,7 +74,6 @@ async function Submit_Refresh() {
     throw new Error(error);
   }
 
-  // refresh_status_element.innerHTML = "Last updated: " + getDateTime();
   // Set the cursor back to default
   document.body.style.cursor = "default";
 
