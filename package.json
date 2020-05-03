@@ -3,9 +3,6 @@
   "version": "1.0.0",
   "description": "A fullstack mock stock market simulator",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/brunersj/EE599_Project.git"
@@ -24,9 +21,19 @@
   "homepage": "https://github.com/brunersj/EE599_Project#readme",
   "dependencies": {
     "axios": "^0.19.2",
+    "config": "^3.3.1",
     "cors": "^2.8.5",
     "express": "^4.17.1",
+    "morgan": "^1.10.0",
     "node-fetch": "^2.6.0",
     "request": "^2.88.2"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "chai-http": "^4.3.0",
+    "mocha": "^7.1.2"
+  },
+  "scripts": {
+    "test": "mocha --timeout 10000"
   }
 }

@@ -59,7 +59,7 @@ async function Submit_Refresh() {
     // Send an HTTP GET request to the backend
     const data = await axios.get(request);
     console.log("data:", data);
-    console.log("data.data: ", JSON.stringify(data.data, null, 2));
+    //console.log("data.data: ", JSON.stringify(data.data, null, 2));
 
     // read error value from backend and display refresh status
     if (data.data[0].error === "NO_ERROR") {

@@ -3,11 +3,19 @@
 global.fetch = require("node-fetch");
 const express = require("express");
 const app = express();
+let morgan = require('morgan');
+let config = require('config'); //we load the db location from the JSON files
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({ extended: false }));
 
 // We need cors middleware to bypass CORS security in browsers.
 const cors = require("cors");
+
+//don't show the log when it is test
+if (config.util.getEnv('NODE_ENV') !== 'test') {
+  //use morgan to log at command line
+  app.use(morgan('combined')); //'combined' outputs the Apache style LOGs
+}
 
 app.use(express.static("static"));
 app.use(cors());
@@ -139,9 +147,14 @@ app.post("/sell", async function (req, res) {
   }
 });
 
+
 app.listen(port, err => {
   console.log(`Listening on port: ${port}`);
 });
+
+// for testing
+module.exports = app;
+
 
 //-----------------------------------------------------------------------------
 /**
@@ -192,7 +205,8 @@ async function handleRefreshGet(req, res, query) {
   await delay(2000);
 
   // Send it back to the frontend.
-  res.send(outputString);
+  // res.send(outputString);
+  res.json(output);
 }
 
 //-----------------------------------------------------------------------------
@@ -244,7 +258,8 @@ async function handleQuoteGet(req, res, query) {
   await delay(2000);
 
   // Send it back to the frontend.
-  res.send(outputString);
+  // res.send(outputString);
+  res.json(output);
 
 }
 
@@ -337,7 +352,8 @@ async function handleBuyPost(req, res, body) {
   await delay(2000);
 
   // Send it back to the frontend.
-  res.send(outputString);
+  // res.send(outputString);
+  res.json(output);
 
   portfolioString = JSON.stringify(portfolio, null, 2);
   console.log("portfolio: ", portfolio);
@@ -437,7 +453,8 @@ async function handleSellPost(req, res, body) {
   await delay(2000);
 
   // Send it back to the frontend.
-  res.send(outputString);
+  // res.send(outputString);
+  res.json(output);
   portfolioString = JSON.stringify(portfolio, null, 2);
   console.log("portfolioString: ", portfolioString);
 

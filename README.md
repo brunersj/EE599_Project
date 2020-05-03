@@ -62,7 +62,17 @@ node app.js
 
 Then open your browser to http://localhost:3000:
 
-<img alt="Frontend" src="https://github.com/brunersj/EE599_Project/blob/master/frontend/screenshot.png?raw=true" width="700">
+<img alt="Frontend1" src="https://github.com/brunersj/EE599_Project/blob/master/frontend/screenshot.png?raw=true" width="700">
+
+Conditional cell value color formatting for gain/loss:
+<img alt="Frontend2" src="https://github.com/brunersj/EE599_Project/blob/master/frontend/gain_loss_color.png?raw=true" width="700">
+
+## Running Tests:
+Backend testing using [Chai](https://www.chaijs.com) and [Mocha](https://mochajs.org)
+
+```bash
+npm test
+```
 
 ## Youtube Demo Video:
 You can watch this demo [here](https://youtu.be/WHd30ijnD-U).
