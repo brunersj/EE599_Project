@@ -5,6 +5,8 @@ function initialize() {
   document.getElementById("cash").innerHTML = "$10,000.00";
   document.getElementById("account_value").innerHTML = "$10,000.00";
   document.getElementById("stock_value").innerHTML = "$0.00";
+  document.getElementById("account_dollar_gain").innerHTML = "$0.00";
+  document.getElementById("account_percent_gain").innerHTML = "0.00%";
   let quote_loader = document.getElementById("quote_loader");
   quote_loader.style.display = "none";
   let trade_loader = document.getElementById("trade_loader");
@@ -13,9 +15,8 @@ function initialize() {
   refresh_loader.style.display = "none";
 
 }
-
 initialize();
-
+Submit_Refresh();
 /**
  * Handle the click event on place order button
  */
@@ -209,7 +210,7 @@ async function Submit_Trade() {
     let request = `http://127.0.0.1:5000/${trade_type}`;
     console.log("request: ", request);
 
-    //  Send an HTTP GET request to the backend
+    //  Send an HTTP POST request to the backend
 
     var myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
@@ -234,7 +235,6 @@ async function Submit_Trade() {
         console.log(portfolio);
         // if backend places order with no error
         if (result[0].error === "NO_ERROR") {
-          //const portfolio = JSON.stringify(result, null, 2);
 
           // update front end portfolio table
           Update_Positions(portfolio);
@@ -270,39 +270,83 @@ async function Submit_Trade() {
 function Update_Positions(portfolio) {
   console.log("in Update_Positions()");
   // update balance
-  console.log(portfolio[1].cash.toLocaleString('us-US', { style: 'currency', currency: 'USD' }));
+  console.log(portfolio[1]);
   let cash_element = document.getElementById("cash");
   let stock_value_element = document.getElementById("stock_value");
   let account_value_element = document.getElementById("account_value");
+  let account_dollar_gain_element = document.getElementById("account_dollar_gain");
+  let account_percent_gain_element = document.getElementById("account_percent_gain");
+  let refresh_status_element = document.getElementById("refresh_status");
+
   cash_element.innerHTML = portfolio[1].cash.toLocaleString('us-US', { style: 'currency', currency: 'USD' });
   stock_value_element.innerHTML = portfolio[1].stock_value.toLocaleString('us-US', { style: 'currency', currency: 'USD' });
   account_value_element.innerHTML = (portfolio[1].cash + portfolio[1].stock_value).toLocaleString('us-US', { style: 'currency', currency: 'USD' });
-  // update table
+  account_dollar_gain_element.innerHTML = (portfolio[1].cash + portfolio[1].stock_value - 10000).toLocaleString('us-US', { style: 'currency', currency: 'USD' });
+  account_percent_gain_element.innerHTML = (100 * (portfolio[1].cash + portfolio[1].stock_value - 10000) / 10000).toFixed(2) + "%";
+
+  // color balance text for gain / loss
+  // change text to green if positive gain
+  if (portfolio[1].cash + portfolio[1].stock_value > 10000) {
+    account_dollar_gain_element.style.color = 'green';
+    account_percent_gain_element.style.color = 'green';
+  } else if (portfolio[1].cash + portfolio[1].stock_value < 10000) {
+    // change text to red if loss
+    account_dollar_gain_element.style.color = 'red';
+    account_percent_gain_element.style.color = 'red';
+  } else if (portfolio[1].cash + portfolio[1].stock_value == 10000) {
+    // change text to black if no gain or loss
+    account_dollar_gain_element.style.color = 'black';
+    account_percent_gain_element.style.color = 'black';
+  }
+
+  // clear table for refresh
   var positions_table_element = document.getElementById("table_body");
   positions_table_element.innerHTML = "";
-  for (i = 2; i < portfolio.length; i++) {
-    var row = positions_table_element.insertRow(i - 2);
-    var cell_company_name = row.insertCell(0);
-    var cell_symbol = row.insertCell(1);
-    var cell_shares = row.insertCell(2);
-    var cell_cost = row.insertCell(3);
-    var cell_market_value = row.insertCell(4);
-    var cell_dollar_gain = row.insertCell(5);
-    var cell_percent_gain = row.insertCell(6);
 
-    cell_company_name.innerHTML = portfolio[i].company_name;
-    cell_symbol.innerHTML = portfolio[i].symbol;
-    cell_shares.innerHTML = portfolio[i].total_shares;
-    cell_cost.innerHTML = portfolio[i].total_cost.toLocaleString('us-US', { style: 'currency', currency: 'USD' });
-    cell_market_value.innerHTML = portfolio[i].market_value.toLocaleString('us-US', { style: 'currency', currency: 'USD' });
-    cell_dollar_gain.innerHTML = (portfolio[i].market_value - portfolio[i].total_cost).toLocaleString('us-US', { style: 'currency', currency: 'USD' });
-    cell_percent_gain.innerHTML = (100 * (portfolio[i].market_value - portfolio[i].total_cost) / portfolio[i].total_cost).toFixed(2) + "%";
+  // update table if portfolio is not empty
+  if (portfolio[0].error === "NO_ERROR") {
+    for (i = 2; i < portfolio.length; i++) {
+      var row = positions_table_element.insertRow(i - 2);
+      var cell_company_name = row.insertCell(0);
+      var cell_symbol = row.insertCell(1);
+      var cell_shares = row.insertCell(2);
+      var cell_cost = row.insertCell(3);
+      var cell_market_value = row.insertCell(4);
+      var cell_dollar_gain = row.insertCell(5);
+      var cell_percent_gain = row.insertCell(6);
 
-    let refresh_status_element = document.getElementById("refresh_status");
+      cell_company_name.innerHTML = portfolio[i].company_name;
+      cell_symbol.innerHTML = portfolio[i].symbol;
+      cell_shares.innerHTML = portfolio[i].total_shares;
+      cell_cost.innerHTML = portfolio[i].total_cost.toLocaleString('us-US', { style: 'currency', currency: 'USD' });
+      cell_market_value.innerHTML = portfolio[i].market_value.toLocaleString('us-US', { style: 'currency', currency: 'USD' });
+      cell_dollar_gain.innerHTML = (portfolio[i].market_value - portfolio[i].total_cost).toLocaleString('us-US', { style: 'currency', currency: 'USD' });
+      cell_percent_gain.innerHTML = (100 * (portfolio[i].market_value - portfolio[i].total_cost) / portfolio[i].total_cost).toFixed(2) + "%";
+
+      // change text to green if positive gain
+      if ((portfolio[i].market_value - portfolio[i].total_cost) > 0) {
+        cell_dollar_gain.style.color = 'green';
+        cell_percent_gain.style.color = 'green';
+      } else if ((portfolio[i].market_value - portfolio[i].total_cost) < 0) {
+        // change text to red if loss
+        cell_dollar_gain.style.color = 'red';
+        cell_percent_gain.style.color = 'red';
+      } else if ((portfolio[i].market_value - portfolio[i].total_cost) == 0) {
+        // change text to black if no gain or loss
+        cell_dollar_gain.style.color = 'black';
+        cell_percent_gain.style.color = 'black';
+      }
+    }
+
     refresh_status_element.innerHTML = "Last updated: " + getDateTime();
+  } else {
+    refresh_status_element.innerHTML = "Portfolio is empty - Last updated: " + getDateTime();
   }
 }
 
+/**
+ * Function to get current time in users time zone 
+ */
 function getDateTime() {
 
   var date = new Date();

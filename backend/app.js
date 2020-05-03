@@ -52,7 +52,8 @@ async function GetQuote(req_symbol) {
     var response = await fetch(iex_api_url);
     const json = await response.json();
     // console.log(json);
-    let price = Number(json.quote.iexRealtimePrice.toFixed(2));
+    // let price = Number(json.quote.iexRealtimePrice.toFixed(2));
+    let price = Number(json.quote.latestPrice.toFixed(2));
     let company_name = json.quote.companyName;
     console.log("companyName: ", company_name);
     console.log("price: ", price);
@@ -159,7 +160,7 @@ async function handleRefreshGet(req, res, query) {
 
   try {
     if (portfolio.length < 2) {
-      throw new Error("No stocks in portfolio to refresh");
+      error = "Portfolio Empty";
     }
     for (let i = 1; i < portfolio.length; i++) {
       const req_symbol = portfolio[i].symbol;
