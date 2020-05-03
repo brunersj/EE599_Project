@@ -65,4 +65,4 @@ Then open your browser to http://localhost:3000:
 <img alt="Frontend" src="https://github.com/brunersj/EE599_Project/blob/master/frontend/screenshot.png?raw=true" width="700">
 
 ## Youtube Demo Video:
-You can watch this demo [here](https://www.youtube.com/watch?v=bo2ebFoscSA).
+You can watch this demo [here](https://youtu.be/WHd30ijnD-U).
