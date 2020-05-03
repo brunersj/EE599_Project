@@ -373,7 +373,6 @@ async function handleSellPost(req, res, body) {
       const quote = await GetQuote(req_symbol);
       price = quote.price;
       cost = Number((price * req_shares).toFixed(2));
-      // cost = Number(cost);
       // find symbol in portfolio
       if (portfolio.find(o => o.symbol === req_symbol)) {
         //sum of shares of requested symbol:
