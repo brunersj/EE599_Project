@@ -14,7 +14,6 @@ describe('/GET quote', () => {
     chai.request(backend)
       .get('/quote?symbol=AAPL')
       .end((err, res) => {
-        // console.log(res.body);
         expect(res).to.have.status(200);
         expect(res.body).to.be.a('object');
         expect(res.body.error).to.be.equal("NO_ERROR");
@@ -28,7 +27,6 @@ describe('/GET quote', () => {
     chai.request(backend)
       .get('/quote?symbol=AFDJS')
       .end((err, res) => {
-        // console.log(res.body);
         expect(res).to.have.status(200);
         expect(res.body).to.be.a('object');
         expect(res.body.error).to.be.equal("Error: 404");
@@ -162,7 +160,6 @@ describe('/GET refresh', () => {
     chai.request(backend)
       .get('/refresh')
       .end((err, res) => {
-        // console.log(res.body);
         expect(res).to.have.status(200);
         expect(res.body).to.be.a('array');
         expect(res.body[0].error).to.be.equal("NO_ERROR");
@@ -212,7 +209,6 @@ describe('/GET refresh', () => {
     chai.request(backend)
       .get('/refresh')
       .end((err, res) => {
-        // console.log(res.body);
         expect(res).to.have.status(200);
         expect(res.body).to.be.a('array');
         expect(res.body).to.have.lengthOf(2);

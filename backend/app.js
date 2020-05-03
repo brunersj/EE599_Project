@@ -205,7 +205,6 @@ async function handleRefreshGet(req, res, query) {
   await delay(2000);
 
   // Send it back to the frontend.
-  // res.send(outputString);
   res.json(output);
 }
 
@@ -258,7 +257,6 @@ async function handleQuoteGet(req, res, query) {
   await delay(2000);
 
   // Send it back to the frontend.
-  // res.send(outputString);
   res.json(output);
 
 }
@@ -344,20 +342,15 @@ async function handleBuyPost(req, res, body) {
   let output = portfolio.slice();
   output.splice(0, 0, output_error);
 
-  // Convert output to JSON
-  let outputString = JSON.stringify(output, null, 2);
-  console.log("outputString: ", outputString);
-
   // Let's generate some artificial delay!
   await delay(2000);
 
   // Send it back to the frontend.
-  // res.send(outputString);
   res.json(output);
 
-  portfolioString = JSON.stringify(portfolio, null, 2);
-  console.log("portfolio: ", portfolio);
-  console.log("portfolioString: ", portfolioString);
+  // portfolioString = JSON.stringify(portfolio, null, 2);
+  // console.log("portfolio: ", portfolio);
+  // console.log("portfolioString: ", portfolioString);
 
 }
 
@@ -445,18 +438,13 @@ async function handleSellPost(req, res, body) {
   let output = portfolio.slice();
   output.splice(0, 0, output_error);
 
-  // Convert output to JSON
-  let outputString = JSON.stringify(output, null, 2);
-  console.log("outputString: ", outputString);
+  portfolioString = JSON.stringify(portfolio, null, 2);
+  console.log("portfolioString: ", portfolioString);
 
   // Let's generate some artificial delay!
   await delay(2000);
 
   // Send it back to the frontend.
-  // res.send(outputString);
   res.json(output);
-  portfolioString = JSON.stringify(portfolio, null, 2);
-  console.log("portfolioString: ", portfolioString);
-
 }
 
