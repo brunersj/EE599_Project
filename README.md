@@ -5,7 +5,8 @@ This project requirement was to develop a complete software solution for an indu
 
 <img alt="highlevel_workflow" src="https://github.com/brunersj/EE599_Project/blob/master/highlevelWorkflowScreenshot.png?raw=true" width="600" text-align="center">
 
-- The frontend is a web page broken into three parts.
+## Functionality and Implementation
+- The frontend web page is broken into three parts.
   1. Balances and Positions:
       - The current portfolio balances are displayed as well as a table providing a breakdown of each stock in the portfolio. This table includes relevant information such as number of shares owned, current market value, dollar and percent gain, etc. This information can be reloaded using a refresh button that sends an HTTP GET request to the backend. The backend responds with the portfolio array that is processed and displayed by the frontend.
   2. Get Quote:
@@ -25,8 +26,12 @@ This project requirement was to develop a complete software solution for an indu
   4. `/sell`:
       - The backend retrieves the updated share price, calculates the cost of the transactions, and deducts these shares from the portfolio if there are sufficient funds in the account. The backend responds to the frontend with the updated portfolio.
 
-
 By default frontend listens on port 3000, and backend listens on port 5000.
+
+## Future Work
+- Support multi-user portfolios with frontend login
+- Leverage Bootstrap4 for frontend dev
+- Develop and test performance of trading algorithms such as Hidden Markov Models
 
 # Install NodeJS
 
