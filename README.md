@@ -1,7 +1,7 @@
 # EE599 Final Project - Mock Stock 
 Stock Market Simulator
 
-This project requirement was to develop a complete software solution for an industrial problem. I designed a fullstack project for mock stock market trading using real-time market data called Mock Stock. 
+This project requirement was to develop a complete software solution for an industrial problem. I designed a fullstack project for mock stock market trading using real-time market data in a risk-free environment called Mock Stock. 
 
 <img alt="highlevel_workflow" src="https://github.com/brunersj/EE599_Project/blob/master/highlevelWorkflowScreenshot.png?raw=true" width="600" text-align="center">
 
